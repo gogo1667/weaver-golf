@@ -82,12 +82,4 @@ jobs:
           path: ${{ runner.temp }}/output/
           retention-days: 30
 
-      # Optional: upload to TestFlight (set APPLEID_EMAIL + APPLEID_PASSWORD in secrets)
-      - name: Upload to TestFlight
-        if: ${{ secrets.APPLEID_EMAIL != '' }}
-        env:
-          APPLEID_EMAIL: ${{ secrets.APPLEID_EMAIL }}
-          APPLEID_PASSWORD: ${{ secrets.APPLEID_PASSWORD }}
-        run: |
-          xcrun altool --upload-app --type ios --file "$RUNNER_TEMP/output/"*.ipa \
-            --username "$APPLEID_EMAIL" --password "$APPLEID_PASSWORD"
+      # (Optional) TestFlight upload step can be added later once IPA build is confirmed.
