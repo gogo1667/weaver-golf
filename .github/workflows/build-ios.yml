@@ -32,10 +32,13 @@ jobs:
           echo "$BUILD_CERTIFICATE_BASE64" | tr -d '\n\r ' | base64 --decode -o $CERTIFICATE_PATH
           echo "$BUILD_PROVISION_PROFILE_BASE64" | tr -d '\n\r ' | base64 --decode -o $PP_PATH
 
+          P12_PASSWORD_TRIM=$(echo -n "$P12_PASSWORD" | tr -d '\n\r')
+          # Verify .p12 + password with openssl before keychain (if this fails, secret/base64 is wrong)
+          openssl pkcs12 -info -in $CERTIFICATE_PATH -passin pass:"$P12_PASSWORD_TRIM" -nokeys || { echo "openssl pkcs12 -info failed (wrong password or corrupted .p12)"; exit 1; }
+
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          P12_PASSWORD_TRIM=$(echo -n "$P12_PASSWORD" | tr -d '\n\r')
           security import $CERTIFICATE_PATH -P "$P12_PASSWORD_TRIM" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
 
