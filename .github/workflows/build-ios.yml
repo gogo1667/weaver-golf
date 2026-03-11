@@ -33,16 +33,13 @@ jobs:
           echo "$BUILD_PROVISION_PROFILE_BASE64" | tr -d '\n\r ' | base64 --decode -o $PP_PATH
 
           P12_PASSWORD_TRIM=$(echo -n "$P12_PASSWORD" | tr -d '\n\r')
-          # Verify .p12 + password with openssl
           openssl pkcs12 -info -in $CERTIFICATE_PATH -passin pass:"$P12_PASSWORD_TRIM" -nokeys || { echo "openssl pkcs12 -info failed"; exit 1; }
-          # Re-export .p12 on runner so macOS security import accepts it (OpenSSL-on-Windows .p12 can be rejected)
-          openssl pkcs12 -in $CERTIFICATE_PATH -passin pass:"$P12_PASSWORD_TRIM" -out $RUNNER_TEMP/repack.p12 -export -passout pass:"$P12_PASSWORD_TRIM"
 
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
-          security import $RUNNER_TEMP/repack.p12 -P "$P12_PASSWORD_TRIM" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD_TRIM" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
 
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles

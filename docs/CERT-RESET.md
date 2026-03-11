@@ -82,10 +82,10 @@ cd C:\Users\gogo1\Repos\certs
 & $openssl x509 -inform der -in distribution.cer -out ios_distribution.pem
 ```
 
-### Step 4.2 – Create .p12 with password (no prompt)
+### Step 4.2 – Create .p12 with password (use -legacy so macOS security import accepts it)
 
 ```powershell
-& $openssl pkcs12 -export -out ios_distribution.p12 -inkey ios_distribution.key -in ios_distribution.pem -passout pass:WeaverGolf2026
+& $openssl pkcs12 -export -legacy -out ios_distribution.p12 -inkey ios_distribution.key -in ios_distribution.pem -passout pass:WeaverGolf2026
 ```
 
 ### Step 4.3 – Verify the password works
