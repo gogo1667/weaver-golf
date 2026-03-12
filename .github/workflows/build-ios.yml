@@ -72,7 +72,7 @@ jobs:
 
       - name: Archive
         run: |
-          xcodebuild -workspace ios/App/App.xcworkspace -scheme App \
+          xcodebuild -project ios/App/App.xcodeproj -scheme App \
             -destination "generic/platform=iOS" \
             -archivePath "$RUNNER_TEMP/App.xcarchive" \
             archive
