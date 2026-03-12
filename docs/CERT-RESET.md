@@ -119,32 +119,48 @@ You should see certificate details and **no** “invalid password” error.
 
 ## Part 6: GitHub secrets (one shot)
 
-**Goal:** All four secrets match the files you just created.
+**Goal:** All secrets match the files you just created. We now send the **PEM cert + key** to GitHub and let the macOS runner build the `.p12` itself.
 
-### Step 6.1 – Base64 the .p12 (no newline)
+### Step 6.1 – Base64 the cert PEM (no newline)
 
-PowerShell’s `Out-File` adds a newline by default; that can corrupt the secret. Use **-NoNewline**:
+In `certs` you already have `ios_distribution.pem` (from `distribution.cer`). Convert it to base64:
 
 ```powershell
 cd C:\Users\gogo1\Repos\certs
-$b64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Users\gogo1\Repos\certs\ios_distribution.p12"))
-[System.IO.File]::WriteAllText("C:\Users\gogo1\Repos\certs\p12-base64.txt", $b64)
+$certB64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Users\gogo1\Repos\certs\ios_distribution.pem"))
+[System.IO.File]::WriteAllText("C:\Users\gogo1\Repos\certs\cert-base64.txt", $certB64)
 ```
 
-Open `p12-base64.txt` in Notepad → Ctrl+A → Ctrl+C. Paste into GitHub in one go (no extra line breaks).
+Open `cert-base64.txt` in Notepad → Ctrl+A → Ctrl+C.
 
-### Step 6.2 – Update BUILD_CERTIFICATE_BASE64
+### Step 6.2 – Update BUILD_CERT_PEM_BASE64
 
 1. GitHub → weaver-golf repo → **Settings** → **Secrets and variables** → **Actions**.
-2. Edit **BUILD_CERTIFICATE_BASE64**.
-3. Ctrl+A in the value box → Ctrl+V (paste from `p12-base64.txt`) → **Update secret**.
+2. Edit **BUILD_CERT_PEM_BASE64** (create it if it doesn’t exist).
+3. Ctrl+A in the value box → Ctrl+V (paste from `cert-base64.txt`) → **Update secret**.
 
-### Step 6.3 – Update P12_PASSWORD
+### Step 6.3 – Base64 the key PEM (no newline)
+
+Now base64 the private key:
+
+```powershell
+$keyB64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Users\gogo1\Repos\certs\ios_distribution.key"))
+[System.IO.File]::WriteAllText("C:\Users\gogo1\Repos\certs\key-base64.txt", $keyB64)
+```
+
+Open `key-base64.txt` → Ctrl+A → Ctrl+C.
+
+### Step 6.4 – Update BUILD_KEY_BASE64
+
+1. Edit **BUILD_KEY_BASE64** (create it if it doesn’t exist).
+2. Ctrl+A → Ctrl+V (paste from `key-base64.txt`) → **Update secret**.
+
+### Step 6.5 – Update P12_PASSWORD
 
 1. Edit **P12_PASSWORD**.
 2. Value: **WeaverGolf2026** (type it, no quotes) → **Update secret**.
 
-### Step 6.4 – Base64 the provisioning profile
+### Step 6.6 – Base64 the provisioning profile
 
 Use the exact filename of your downloaded profile (e.g. `Weaver_Golf_App_Store.mobileprovision`). In PowerShell:
 
@@ -154,12 +170,12 @@ Use the exact filename of your downloaded profile (e.g. `Weaver_Golf_App_Store.m
 
 If your file has a different name, replace it in the path. Open `pp-base64.txt` → Ctrl+A → Ctrl+C.
 
-### Step 6.5 – Update BUILD_PROVISION_PROFILE_BASE64
+### Step 6.7 – Update BUILD_PROVISION_PROFILE_BASE64
 
 1. Edit **BUILD_PROVISION_PROFILE_BASE64**.
 2. Ctrl+A → Ctrl+V (paste from `pp-base64.txt`) → **Update secret**.
 
-### Step 6.6 – KEYCHAIN_PASSWORD
+### Step 6.8 – KEYCHAIN_PASSWORD
 
 Edit **KEYCHAIN_PASSWORD** and set it to any random string (e.g. `MyKeychain2026`). If it’s already set, you can leave it.
 
