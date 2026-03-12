@@ -71,12 +71,12 @@ jobs:
         run: npx cap sync ios
 
       - name: Archive
-        env:
-          DEVELOPMENT_TEAM: WCV63TD2AQ
         run: |
           xcodebuild -project ios/App/App.xcodeproj -scheme App \
             -destination "generic/platform=iOS" \
             -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            DEVELOPMENT_TEAM=WCV63TD2AQ \
+            CODE_SIGN_STYLE=Manual \
             archive
 
       - name: Export IPA
