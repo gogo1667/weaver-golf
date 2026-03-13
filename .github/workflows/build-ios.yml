@@ -72,6 +72,9 @@ jobs:
 
       - name: Archive
         run: |
+          # Use an auto-incrementing build number so each TestFlight upload is unique
+          BUILD_NUMBER=$GITHUB_RUN_NUMBER
+
           xcodebuild -project ios/App/App.xcodeproj -scheme App \
             -destination "generic/platform=iOS" \
             -archivePath "$RUNNER_TEMP/App.xcarchive" \
@@ -79,12 +82,13 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="Weaver Golf App Store" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
+            CURRENT_PROJECT_VERSION=$BUILD_NUMBER \
             archive
 
       - name: Export IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+          -archivePath "$RUNNER_TEMP/App.xcarchive" \
             -exportOptionsPlist exportOptions.plist \
             -exportPath "$RUNNER_TEMP/output" \
             -allowProvisioningUpdates
@@ -98,7 +102,7 @@ jobs:
             --file "$RUNNER_TEMP/output/"*.ipa \
             --username "$APPLEID_EMAIL" \
             --password "$APPLEID_PASSWORD"
-            
+
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
