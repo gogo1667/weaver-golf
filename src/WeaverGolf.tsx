@@ -302,6 +302,9 @@ export default function WeaverGolf() {
   }, [aimAngle, power]);
 
   useEffect(() => {
+    if (!hasStarted) {
+      return;
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -386,9 +389,12 @@ export default function WeaverGolf() {
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [holeIndex, layout.walls, layout.hole, strokes]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hasStarted, holeIndex, layout.walls, layout.hole, strokes]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (!hasStarted) {
+      return;
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -469,7 +475,7 @@ export default function WeaverGolf() {
     };
     drawId = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(drawId);
-  }, [holeIndex, layout.walls, layout.hole]);
+  }, [hasStarted, holeIndex, layout.walls, layout.hole]);
 
   const toCanvasCoords = (clientX: number, clientY: number): Vec | null => {
     const canvas = canvasRef.current;
