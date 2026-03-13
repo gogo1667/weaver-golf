@@ -494,29 +494,76 @@ export default function WeaverGolf() {
 
   const canPutt = Math.hypot(velocity.x, velocity.y) <= STOP_THRESHOLD;
 
+  const renderControls = () => (
+    <div className={`${styles.controls} ${!canPutt ? styles.controlsDisabled : ''}`}>
+      <div className={styles.powerRow}>
+        <label htmlFor="power" className={styles.powerLabel}>Power</label>
+        <input
+          id="power"
+          type="range"
+          min={0}
+          max={MAX_POWER}
+          step={0.5}
+          value={power}
+          onChange={(e) => setPower(Number(e.target.value))}
+          className={styles.powerSlider}
+          disabled={!canPutt}
+          aria-disabled={!canPutt}
+        />
+        <span className={styles.powerValue}>{Math.round(power)}</span>
+      </div>
+      <button type="button" onClick={handleHit} className={styles.hitBtn} disabled={!canPutt}>
+        Hit
+      </button>
+    </div>
+  );
+
   if (gameComplete) {
     const total = totalStrokes;
     return (
       <div className={styles.page}>
-        <div className={styles.card}>
-          <h1 className={styles.title}>Nice round!</h1>
-          <p className={styles.score}>You finished 3 holes in <strong>{total}</strong> strokes.</p>
-          <div className={styles.actions}>
-            <button
-              type="button"
-              className={styles.replayBtn}
-              onClick={() => {
-                setGameComplete(false);
-                setHoleIndex(0);
-                setTotalStrokes(0);
-                setBall(HOLES[0].ballStart);
-                setVelocity({ x: 0, y: 0 });
-                setStrokes(0);
-              }}
-            >
-              Play again
-            </button>
+        <div className={styles.overlay}>
+          <div className={styles.overlayCard}>
+            <h1 className={styles.title}>Nice round!</h1>
+            <p className={styles.score}>
+              You finished 3 holes in <strong>{total}</strong> strokes.
+            </p>
+            <div className={styles.actions}>
+              <button
+                type="button"
+                className={styles.replayBtn}
+                onClick={() => {
+                  setGameComplete(false);
+                  setHoleIndex(0);
+                  setTotalStrokes(0);
+                  setBall(HOLES[0].ballStart);
+                  setVelocity({ x: 0, y: 0 });
+                  setStrokes(0);
+                }}
+              >
+                Play again
+              </button>
+            </div>
           </div>
+        </div>
+        <div className={styles.stage}>
+          <div className={styles.topBar}>
+            <span className={styles.statusText}>Weaver Golf · Hole {holeNum} of 3</span>
+            <span className={styles.statusText}>Strokes: {strokes}</span>
+          </div>
+          <div className={styles.mainRow}>
+            <div className={styles.canvasPane}>
+              <canvas
+                ref={canvasRef}
+                width={CANVAS_W}
+                height={CANVAS_H}
+                className={styles.canvas}
+                onClick={handleCanvasClick}
+              />
+            </div>
+            <div className={styles.sidePane}>{renderControls()}</div>
+          </div>
+          <p className={styles.hint}>Tap the green to aim · Adjust power · Hit to putt</p>
         </div>
       </div>
     );
@@ -524,42 +571,28 @@ export default function WeaverGolf() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Weaver Golf</h1>
-          <p className={styles.holeInfo}>Hole {holeNum} of 3 · Strokes: {strokes}</p>
+      <div className={styles.stage}>
+        <div className={styles.topBar}>
+          <span className={styles.statusText}>Weaver Golf · Hole {holeNum} of 3</span>
+          <span className={styles.statusText}>Strokes: {strokes}</span>
         </div>
-        <div className={styles.canvasWrap}>
-          <canvas
-            ref={canvasRef}
-            width={CANVAS_W}
-            height={CANVAS_H}
-            className={styles.canvas}
-            onClick={handleCanvasClick}
-          />
-        </div>
-        <div className={`${styles.controls} ${!canPutt ? styles.controlsDisabled : ''}`}>
-          <div className={styles.powerRow}>
-            <label htmlFor="power" className={styles.powerLabel}>Power</label>
-            <input
-              id="power"
-              type="range"
-              min={0}
-              max={MAX_POWER}
-              step={0.5}
-              value={power}
-              onChange={(e) => setPower(Number(e.target.value))}
-              className={styles.powerSlider}
-              disabled={!canPutt}
-              aria-disabled={!canPutt}
+        <div className={styles.mainRow}>
+          <div className={styles.canvasPane}>
+            <canvas
+              ref={canvasRef}
+              width={CANVAS_W}
+              height={CANVAS_H}
+              className={styles.canvas}
+              onClick={handleCanvasClick}
             />
-            <span className={styles.powerValue}>{Math.round(power)}</span>
           </div>
-          <button type="button" onClick={handleHit} className={styles.hitBtn} disabled={!canPutt}>
-            Hit
-          </button>
+          <div className={styles.sidePane}>{renderControls()}</div>
         </div>
-        <p className={styles.hint}>{canPutt ? 'Click on the green to aim · Set power · Hit to putt' : '…'}</p>
+        <p className={styles.hint}>
+          {canPutt
+            ? 'Tap the green to aim · Adjust power · Hit to putt'
+            : 'Ball is rolling… wait for it to stop.'}
+        </p>
       </div>
     </div>
   );
