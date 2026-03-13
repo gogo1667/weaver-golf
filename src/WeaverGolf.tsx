@@ -243,6 +243,7 @@ export default function WeaverGolf() {
   const [strokes, setStrokes] = useState(0);
   const [totalStrokes, setTotalStrokes] = useState(0);
   const [gameComplete, setGameComplete] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const velRef = useRef<Vec>({ x: 0, y: 0 });
   const ballRef = useRef<Vec>(HOLES[0].ballStart);
@@ -517,6 +518,30 @@ export default function WeaverGolf() {
       </button>
     </div>
   );
+
+  if (!hasStarted) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.stage}>
+          <div className={styles.overlay}>
+            <div className={styles.overlayCard}>
+              <h1 className={styles.title}>Weaver Golf</h1>
+              <p className={styles.score}>3 holes. Avoid the Dreamweaver and sink your putts.</p>
+              <div className={styles.actions}>
+                <button
+                  type="button"
+                  className={styles.replayBtn}
+                  onClick={() => setHasStarted(true)}
+                >
+                  Tap to Start
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (gameComplete) {
     const total = totalStrokes;
