@@ -89,7 +89,7 @@ function segmentDistance(px: number, py: number, x1: number, y1: number, x2: num
   return Math.hypot(px - projX, py - projY);
 }
 
-const HEAD_R = 22;
+const HEAD_R = 26;
 const HEAD_Y_OFFSET = 38;
 
 function drawStickFigure(
@@ -142,8 +142,8 @@ function drawStickFigure(
   ctx.stroke();
 }
 
-const BEER_CAN_W = 22;
-const BEER_CAN_H = 48;
+const BOTTLE_W = 22;
+const BOTTLE_H = 48;
 
 function drawBeerBottle(
   ctx: CanvasRenderingContext2D,
@@ -151,8 +151,8 @@ function drawBeerBottle(
   cy: number,
   canImage: HTMLImageElement | null
 ) {
-  const w = BEER_CAN_W;
-  const h = BEER_CAN_H;
+  const w = BOTTLE_W;
+  const h = BOTTLE_H;
   if (canImage?.complete && canImage.naturalWidth > 0) {
     ctx.save();
     ctx.beginPath();
@@ -233,8 +233,8 @@ function drawCigarettes(
 }
 
 const FACE_IMAGE_URL = '/images/obstacle-face.png';
-const BEER_CAN_IMAGE_URL = '/images/beer-can.png';
-const CIGARETTES_PACK_IMAGE_URL = '/images/cigarettes-pack.png';
+const BOTTLE_IMAGE_URL = '/images/bottle.png';
+const CIGARETTES_PACK_IMAGE_URL = '/images/pack.png';
 
 export default function WeaverGolf() {
   const [holeIndex, setHoleIndex] = useState(0);
@@ -253,7 +253,7 @@ export default function WeaverGolf() {
   const aimAngleRef = useRef(aimAngle);
   const powerRef = useRef(power);
   const faceImageRef = useRef<HTMLImageElement | null>(null);
-  const beerCanImageRef = useRef<HTMLImageElement | null>(null);
+  const bottleImageRef = useRef<HTMLImageElement | null>(null);
   const cigarettesPackImageRef = useRef<HTMLImageElement | null>(null);
 
   const layout = HOLES[holeIndex];
@@ -419,7 +419,7 @@ export default function WeaverGolf() {
       if (layout.obstacles) {
         for (const obs of layout.obstacles) {
           if (obs.type === 'stickFigure') drawStickFigure(ctx, obs.x, obs.y, faceImageRef.current);
-          else if (obs.type === 'beerBottle') drawBeerBottle(ctx, obs.x, obs.y, beerCanImageRef.current);
+          else if (obs.type === 'beerBottle') drawBeerBottle(ctx, obs.x, obs.y, bottleImageRef.current);
           else if (obs.type === 'trashCan') drawTrashCan(ctx, obs.x, obs.y);
           else if (obs.type === 'cigarettes') drawCigarettes(ctx, obs.x, obs.y, cigarettesPackImageRef.current);
         }
