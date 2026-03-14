@@ -267,9 +267,9 @@ export default function WeaverGolf() {
 
   useEffect(() => {
     const img = new Image();
-    img.onload = () => { beerCanImageRef.current = img; };
-    img.src = BEER_CAN_IMAGE_URL;
-    return () => { beerCanImageRef.current = null; };
+    img.onload = () => { bottleImageRef.current = img; };
+    img.src = BOTTLE_IMAGE_URL;
+    return () => { bottleImageRef.current = null; };
   }, []);
 
   useEffect(() => {
